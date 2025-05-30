@@ -1,0 +1,27 @@
+[
+    {
+      "id": 1,
+      "name": "Economy Sedan",
+      "price_per_day": 45,
+      "rating": 4.8,
+      "image": "img/economy.jpg",
+      "features": "4 Doors | 5 Seats | Auto | A/C"
+    },
+    {
+      "id": 2,
+      "name": "Premium SUV",
+      "price_per_day": 85,
+      "rating": 4.9,
+      "image": "img/suv.jpg",
+      "features": "5 Doors | 7 Seats | Auto | A/C"
+    },
+    {
+      "id": 3,
+      "name": "Luxury Sedan",
+      "price_per_day": 120,
+      "rating": 5.0,
+      "image": "img/luxury.jpg",
+      "features": "4 Doors | 5 Seats | Auto | A/C"
+    }
+  ]
+  
