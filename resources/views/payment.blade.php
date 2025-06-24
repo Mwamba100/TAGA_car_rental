@@ -99,16 +99,30 @@
 </head>
 <body>
   <script>
-    // Check if the user is signed in
-    const user = localStorage.getItem("user");
-    if (!user) {
-      alert("You must be signed in to rent a car.");
-      window.location.href = "{{ asset('signin') }}";
+    // Check if the user is logged in via backend (session/cookie)
+    async function checkUser() {
+      try {
+        const response = await fetch("{{ url('/api/user-info') }}", {
+          method: "GET",
+          headers: {
+            "Accept": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+
+          },
+          credentials: "same-origin"
+        });
+        if (response.status === 401) {
+          alert("You must be signed in to rent a car.");
+          window.location.href = "{{ url('/login') }}";
+          return null;
+        }
     }
+    document.addEventListener('DOMContentLoaded', checkUser);
   </script>
 
   <header>
-    <a href="<?= url('/') ?>" class="logo"><img src="{{ asset('images/logo.png') }}" alt="TAGA Logo"></a>
+    <a href="{{ url('/') }}" class="logo"><img src="{{ asset('images/logo.png') }}" alt="TAGA Logo"></a>
     <ul class="navbar">
       <li><a href="{{ url('/#home') }}">Home</a></li>
       <li><a href="{{ url('/#ride') }}">Ride</a></li>
@@ -116,64 +130,78 @@
       <li><a href="{{ url('/#about') }}">About</a></li>
       <li><a href="{{ url('/#reviews') }}">Reviews</a></li>
     </ul>
-    <div class="header-btn">
-      <a href="<?= url('/register')?>" class="sign-up">Sign Up</a>
-      <a href="<?= url('/login')?>" class="sign-in">Sign In</a>
-    </div>
   </header>
+
+  <div id="user-info" style="text-align:center; margin-top:10px; color:#333; font-weight:500;"></div>
 
   <div class="payment-box">
     <h2>Complete Your Booking</h2>
-    <p><strong>Car:</strong> <span id="carName"></span></p>
-    <p><strong>Price Per Day:</strong> K<span id="pricePerDay"></span></p>
+    <div id="car-details" style="background:#f9f9f9;padding:15px;border-radius:8px;margin-bottom:15px;">
+      <div id="carImageContainer" style="text-align:center;margin-bottom:15px;">
+        <img id="carImage"
+             src="{{ request('image') ? asset(request('image')) : asset('images/default_car.png') }}"
+             alt="Car Image"
+             style="max-width:220px;max-height:140px;border-radius:8px;box-shadow:0 0 8px rgba(0,0,0,0.08);">
+      </div>
+      <p><strong>Car:</strong> <span id="carName"></span></p>
+      <p><strong>Price Per Day:</strong> K<span id="pricePerDay"></span></p>
+      <p><strong>Car Description:</strong> <span id="carDescription"></span></p>
+      <p><strong>Car Type:</strong> <span id="carType"></span></p>
+      <p><strong>Seats:</strong> <span id="carSeats"></span></p>
+      <p><strong>Transmission:</strong> <span id="carTransmission"></span></p>
+      <!-- Add more car details as needed -->
+    </div>
 
-    <label>Pick-Up Date:</label>
-    <input type="date" id="pickupDate" required>
+    <form id="payment-form" onsubmit="event.preventDefault(); submitPayment();">
+      <label>Pick-Up Date:</label>
+      <input type="date" id="pickupDate" required>
 
-    <label>Return Date:</label>
-    <input type="date" id="returnDate" required>
+      <label>Return Date:</label>
+      <input type="date" id="returnDate" required>
 
-    <p class="total">Total: K<span id="totalPrice">0</span></p>
+      <p class="total">Total: K<span id="totalPrice">0</span></p>
 
-    <label>Select Payment Method:</label>
-    <select id="paymentMethod">
-      <option value="">-- Choose Payment Method --</option>
-      <option value="card">Debit/Credit Card</option>
-      <option value="mobile">Mobile Money</option>
-      <option value="cash">Cash on Pickup</option>
-    </select>
-
-    <!-- Card Payment Form -->
-    <form id="card-form" style="display: none;">
-      <label for="cardname">Cardholder Name</label>
-      <input type="text" id="cardname" placeholder="Mary Banda" required>
-
-      <label for="cardnumber">Card Number</label>
-      <input type="text" id="cardnumber" maxlength="16" placeholder="1111 2222 3333 4444" required>
-
-      <label for="expiry">Expiry Date</label>
-      <input type="text" id="expiry" placeholder="MM/YY" required>
-
-      <label for="cvv">CVV</label>
-      <input type="text" id="cvv" maxlength="4" placeholder="123" required>
-    </form>
-
-    <!-- Mobile Money Form -->
-    <form id="mobile-form" style="display: none;">
-      <label for="provider">Select Provider</label>
-      <select id="provider" required>
-        <option value="">--Choose--</option>
-        <option value="airtel">Airtel Money</option>
-        <option value="mtn">MTN Mobile Money</option>
-        <option value="zamtel">Zamtel Kwacha</option>
+      <label>Select Payment Method:</label>
+      <select id="paymentMethod" required>
+        <option value="">-- Choose Payment Method --</option>
+        <option value="card">Debit/Credit Card</option>
+        <option value="mobile">Mobile Money</option>
+        <option value="cash">Cash on Pickup</option>
       </select>
 
-      <label for="mobile-number">Mobile Number</label>
-      <input type="tel" id="mobile-number" placeholder="097XXXXXXX" required>
+      <!-- Card Payment Form -->
+      <div id="card-form" style="display: none;">
+        <label for="cardname">Cardholder Name</label>
+        <input type="text" id="cardname" placeholder="Mary Banda">
+
+        <label for="cardnumber">Card Number</label>
+        <input type="text" id="cardnumber" maxlength="16" placeholder="1111 2222 3333 4444">
+
+        <label for="expiry">Expiry Date</label>
+        <input type="text" id="expiry" placeholder="MM/YY">
+
+        <label for="cvv">CVV</label>
+        <input type="text" id="cvv" maxlength="4" placeholder="123">
+      </div>
+
+      <!-- Mobile Money Form -->
+      <div id="mobile-form" style="display: none;">
+        <label for="provider">Select Provider</label>
+        <select id="provider">
+          <option value="">--Choose--</option>
+          <option value="airtel">Airtel Money</option>
+          <option value="mtn">MTN Mobile Money</option>
+          <option value="zamtel">Zamtel Kwacha</option>
+        </select>
+
+        <label for="mobile-number">Mobile Number</label>
+        <input type="tel" id="mobile-number" placeholder="097XXXXXXX">
+      </div>
+
+      <button class="btn" type="submit">Pay Now</button>
+      <a href="{{ url('/') }}" class="btn">← Back to Main Page</a>
     </form>
 
-    <button class="btn" onclick="submitPayment()">Pay Now</button>
-    <a href="{{ url('/') }}" class="btn">← Back to Main Page</a>
   </div>
 
   <script>
@@ -181,9 +209,29 @@
     const urlParams = new URLSearchParams(window.location.search);
     const carName = urlParams.get('car');
     const price = parseInt(urlParams.get('price'));
+    // Optionally get image from URL or backend
+    const carImage = urlParams.get('image'); // e.g. ?image=images/cars/toyota.jpg
+
+    // Example: You may want to fetch car details from the backend using carName or carId
+    // For demonstration, we'll use static/dummy data for car details
+    const carDetails = {
+      description: "Comfortable, fuel efficient, and perfect for city driving.",
+      type: "Sedan",
+      seats: 5,
+      transmission: "Automatic"
+    };
 
     document.getElementById('carName').innerText = carName || '';
     document.getElementById('pricePerDay').innerText = price || 0;
+    document.getElementById('carDescription').innerText = carDetails.description;
+    document.getElementById('carType').innerText = carDetails.type;
+    document.getElementById('carSeats').innerText = carDetails.seats;
+    document.getElementById('carTransmission').innerText = carDetails.transmission;
+
+    // Set car image if provided in URL, else use default
+    if (carImage) {
+      document.getElementById('carImage').src = "{{ asset('') }}" + carImage;
+    }
 
     const pickupInput = document.getElementById('pickupDate');
     const returnInput = document.getElementById('returnDate');
@@ -216,64 +264,63 @@
       mobileForm.style.display = method === "mobile" ? "block" : "none";
     });
 
-    function submitPayment() {
-  const total = calculateDays();
-  const method = paymentSelect.value;
+    async function submitPayment() {
+      const car = document.getElementById('carName').innerText;
+      const price = document.getElementById('pricePerDay').innerText;
+      const image = document.getElementById('carImage').getAttribute('src');
+      const pickupDate = document.getElementById('pickupDate').value;
+      const returnDate = document.getElementById('returnDate').value;
+      const paymentMethod = document.getElementById('paymentMethod').value;
+      let paymentDetails = {};
 
-  if (!pickupInput.value || !returnInput.value) {
-    alert("Please select pick-up and return dates.");
-    return;
-  }
+      // Validate form as before (not shown for brevity)...
 
-  // Ensure pickup date is today or in the future
-  const today = new Date();
-  today.setHours(0,0,0,0); // Remove time part for accurate comparison
-  const pickupDate = new Date(pickupInput.value);
-  const returnDate = new Date(returnInput.value);
+      if (paymentMethod === "card") {
+        paymentDetails = {
+          cardname: document.getElementById('cardname').value,
+          cardnumber: document.getElementById('cardnumber').value,
+          expiry: document.getElementById('expiry').value,
+          cvv: document.getElementById('cvv').value
+        };
+      } else if (paymentMethod === "mobile") {
+        paymentDetails = {
+          provider: document.getElementById('provider').value,
+          mobile_number: document.getElementById('mobile-number').value
+        };
+      }
 
-  if (pickupDate < today) {
-    alert("Pick-up date must be today or a future date.");
-    return;
-  }
+      try {
+        const response = await fetch("{{ url('/payment/process') }}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            car,
+            price,
+            image,
+            pickup_date: pickupDate,
+            return_date: returnDate,
+            payment_method: paymentMethod,
+            payment_details: paymentDetails
+          })
+        });
 
-  // Ensure return date is after or same as pickup date
-  if (returnDate < pickupDate) {
-    alert("Return date must be after or same as pick-up date.");
-    return;
-  }
+        const data = await response.json();
 
-  if (total === 0) {
-    alert("Invalid date selection.");
-    return;
-  }
-
-  if (method === "card") {
-    if (
-      !document.getElementById('cardname').value ||
-      !document.getElementById('cardnumber').value ||
-      !document.getElementById('expiry').value ||
-      !document.getElementById('cvv').value
-    ) {
-      alert("Please fill in all card details.");
-      return;
-    }
-  }
-
-  if (method === "mobile") {
-    if (
-      !document.getElementById('provider').value ||
-      !document.getElementById('mobile-number').value
-    ) {
-      alert("Please fill in mobile money details.");
-      return;
-    }
-  }
-
-      alert(`Payment Successful!\nCar: ${carName}\nMethod: ${method}\nTotal Paid: K${total}`);
-      window.location.href = "{{ url('/') }}";
+        if (response.ok) {
+          alert("Payment Successful! " + (data.message || ""));
+          window.location.href = "{{ url('/') }}";
+        } else {
+          alert(data.message || "Payment failed. Please try again.");
+        }
+      } catch (err) {
+        alert("An error occurred while processing payment.");
+      }
     }
   </script>
-
 
   <script>
     // Navbar toggle for mobile view

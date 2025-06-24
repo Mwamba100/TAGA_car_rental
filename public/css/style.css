@@ -56,6 +56,9 @@ header {
 
 .navbar {
   display: flex;
+  transition: max-height 0.3s;
+  overflow: hidden;
+  max-height: 0;
 }
 .navbar li {
   position: relative;
@@ -456,6 +459,7 @@ header {
   }
   .navbar.active {
     top: 100%;
+    max-height: 500px; /* or enough to show all links */
   }
   .navbar a {
     padding: 1rem;
@@ -571,4 +575,37 @@ header {
 
 .hidden {
   display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    display: none;
+    flex-direction: column;
+    background: #fff;
+    position: absolute;
+    top: 60px; /* adjust as needed */
+    left: 0;
+    width: 100%;
+    z-index: 100;
+  }
+  .navbar.active {
+    display: flex;
+  }
+  #menu-icon {
+    display: block;
+    font-size: 2rem;
+    cursor: pointer;
+  }
+}
+@media (min-width: 769px) {
+  .navbar {
+    display: flex !important;
+    position: static;
+    flex-direction: row;
+    background: none;
+    width: auto;
+  }
+  #menu-icon {
+    display: none;
+  }
 }

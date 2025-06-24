@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -305,17 +304,41 @@
 
     <!-- JavaScript for interactivity -->
     <script>
-        // Login Logic (for demo purposes only)
-        document.getElementById("loginForm").addEventListener("submit", function (e) {
+        // Login Logic (send login request to AuthController)
+        document.getElementById("loginForm").addEventListener("submit", async function (e) {
             e.preventDefault();
             const username = document.getElementById("loginUsername").value;
             const password = document.getElementById("loginPassword").value;
-            if (username === "admin" && password === "admin123") {
-                document.getElementById("loginModal").style.display = "none";
-                document.getElementById("adminPanel").style.display = "flex";
-                document.getElementById("adminName").innerText = username;
-            } else {
-                alert("Invalid credentials!");
+
+            try {
+                const response = await fetch("{{ url('/auth/login') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: username,
+                        password: password
+                    }),
+                    credentials: "same-origin"
+                });
+
+                if (response.ok) {
+                    // Login successful
+                    document.getElementById("loginModal").style.display = "none";
+                    document.getElementById("adminPanel").style.display = "flex";
+                    document.getElementById("adminName").innerText = username;
+                    fetchCars();
+                    fetchBookings();
+                    fetchUsers();
+                } else {
+                    const data = await response.json();
+                    alert(data.message || "Login failed. Please check your credentials.");
+                }
+            } catch (err) {
+                alert("An error occurred during login. Please try again.");
             }
         });
 
@@ -347,6 +370,66 @@
             document.getElementById("carId").value = "";
             document.getElementById("carFormTitle").innerText = "Add New Car";
             document.getElementById("carSubmitBtn").innerText = "Add Car";
+        }
+
+        // Fetch and display cars
+        async function fetchCars() {
+            const res = await fetch('/admin/cars');
+            const cars = await res.json();
+            const tbody = document.getElementById('carsTable');
+            tbody.innerHTML = '';
+            cars.forEach(car => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><img src="${car.image ? car.image : 'images/default_car.png'}" class="car-image"></td>
+                        <td>${car.name}</td>
+                        <td>${car.year}</td>
+                        <td>K${car.price}</td>
+                        <td>${car.category}</td>
+                        <td>${car.available ? 'Yes' : 'No'}</td>
+                        <td><!-- Actions here --></td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Fetch and display bookings
+        async function fetchBookings() {
+            const res = await fetch('/admin/bookings');
+            const bookings = await res.json();
+            const tbody = document.getElementById('bookingsTable');
+            tbody.innerHTML = '';
+            bookings.forEach(b => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${b.user_name}</td>
+                        <td>${b.car_name}</td>
+                        <td>${b.pickup_date}</td>
+                        <td>${b.return_date}</td>
+                        <td>K${b.total}</td>
+                        <td>${b.status}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // Fetch and display users
+        async function fetchUsers() {
+            const res = await fetch('/admin/users');
+            const users = await res.json();
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = '';
+            users.forEach(u => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${u.name}</td>
+                        <td>${u.email}</td>
+                        <td>${u.phone}</td>
+                        <td>${u.status || 'Active'}</td>
+                        <td><!-- Actions here --></td>
+                    </tr>
+                `;
+            });
         }
     </script>
 </body>

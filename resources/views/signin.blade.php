@@ -80,16 +80,16 @@
     <h2>Sign In</h2>
 
     <form id="signin-form">
-      <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Enter your username" required>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="Enter your email" required>
 
       <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Enter your password" required>
+      <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
       <button type="submit" class="btn">Sign In</button>
     </form>
 
-    <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+    <p>Don't have an account? <a href="{{ url('/register') }}">Sign Up</a></p>
   </div>
 
   <div class="copyright">
@@ -97,29 +97,39 @@
   </div>
 
   <script>
-  document.getElementById('signin-form').addEventListener('submit', function(e) {
+  document.getElementById('signin-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
 
-    // Dummy user
-    const dummyUser = {
-      username: "user",
-      password: "123456",
-      email: "user@example.com"
-    };
+    try {
+      const response = await fetch("{{ url('/auth/login') }}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ email, password })
+      });
 
-    // Check credentials
-    if (username === dummyUser.username && password === dummyUser.password) {
-      // Store user session
-      localStorage.setItem("user", JSON.stringify({ username: dummyUser.username, email: dummyUser.email }));
-      alert("Sign In Successful!");
-      window.location.href = "<?php echo url('/'); ?>"; // Redirect to home page
-    } else {
-      alert("Invalid username or password!");
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Sign In Successful!");
+        window.location.href = "{{ url('/') }}";
+      } else {
+        let msg = data.message || "Login failed.";
+        if (data.errors) {
+          msg += "\n" + Object.values(data.errors).flat().join('\n');
+        }
+        alert(msg);
+      }
+    } catch (error) {
+      alert("An error occurred. Please try again.");
     }
   });
-</script>
+  </script>
 
 </body>
 </html>

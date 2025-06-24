@@ -17,15 +17,23 @@
       </a>
       <div class="bx bx-menu" id="menu-icon"></div>
       <ul class="navbar">
-        <li><a href="#home">Home</a></li>
+        <li><a href="{{ url('/') }}">Home</a></li>
         <li><a href="#ride">Ride</a></li>
         <li><a href="#services">Services</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#reviews">Reviews</a></li>
       </ul>
       <div class="header-btn">
-        <a href="#" class="sign-up">Sign Up</a>
-        <a href="#" class="sign-in">Sign In</a>
+        @guest
+          <a href="{{ url('/register') }}" class="sign-up">Sign Up</a>
+          <a href="{{ url('/login') }}" class="sign-in">Sign In</a>
+        @else
+          <a href="{{ url('/dashboard') }}" class="sign-in">Dashboard</a>
+          <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+          <form id="logout-form" action="{{ url('/logout') }}" method="POST" style="display:none;">
+            @csrf
+          </form>
+        @endguest
       </div>
     </header>
 
@@ -308,17 +316,69 @@
     <script>
       const rentButtons = document.querySelectorAll('.rent-btn');
       rentButtons.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          const user = localStorage.getItem("user");
-          if (!user) {
+        btn.addEventListener('click', async function(e) {
+          @guest
             e.preventDefault();
             alert("Please sign in to rent a car.");
-            // Redirect to sign-in page
-            window.location.href = "<?php echo url('/login'); ?>";
-          }
+            window.location.href = "{{ url('/login') }}";
+          @else
+            e.preventDefault();
+            try {
+              // Fetch user info via AJAX
+              const response = await fetch("{{ url('/api/user-info') }}", {
+                method: "GET",
+                headers: {
+                  "Accept": "application/json",
+                  "X-Requested-With": "XMLHttpRequest",
+                  "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                },
+                credentials: "same-origin"
+              });
+              const user = await response.json();
+              // List of required fields
+              const requiredFields = [
+                'name','email','phone','address','nrc_no','company','job_title','birth_date',
+                'city','state','country','postal_code','profile_picture'
+              ];
+              let missing = requiredFields.filter(f => !user[f] || user[f] === "");
+              if (missing.length > 0) {
+                alert("Please complete your profile before renting a car.");
+                window.location.href = "{{ url('/profile/complete') }}";
+                return;
+              }
+              // All fields present, continue to payment
+              // --- Add image location to payment URL ---
+              const box = btn.closest('.box');
+              const img = box ? box.querySelector('img') : null;
+              let imageUrl = img ? img.getAttribute('src') : '';
+              // Remove domain if asset() returns absolute URL
+              if (imageUrl.startsWith(window.location.origin)) {
+                imageUrl = imageUrl.replace(window.location.origin + '/', '');
+              }
+              const url = new URL(btn.getAttribute('href'), window.location.origin);
+              url.searchParams.set('image', imageUrl);
+              window.location.href = url.toString();
+            } catch (err) {
+              alert("Could not verify your profile. Please try again.");
+            }
+          @endguest
         });
       });
     </script>
     <script src="{{ asset('js/main.js') }}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const menu = document.getElementById('menu-icon');
+        const navbar = document.querySelector('.navbar');
+        menu.onclick = function() {
+          menu.classList.toggle('bx-x');
+          navbar.classList.toggle('active');
+        };
+        window.onscroll = function() {
+          menu.classList.remove('bx-x');
+          navbar.classList.remove('active');
+        };
+      });
+    </script>
   </body>
 </html>

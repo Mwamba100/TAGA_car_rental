@@ -81,15 +81,24 @@
 
     <form id="signup-form">
       <label for="new-username">Username</label>
-      <input type="text" id="new-username" placeholder="Choose a username" required>
+      <input type="text" id="new-username" name="name" placeholder="Choose a username" required>
+
+      <label for="new-email">Email</label>
+      <input type="email" id="new-email" name="email" placeholder="Enter your email" required>
+
+      <label for="new-phone">Phone Number</label>
+      <input type="text" id="new-phone" name="phone" placeholder="Enter your phone number" required pattern="\d*" inputmode="numeric" maxlength="20" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
 
       <label for="new-password">Password</label>
-      <input type="password" id="new-password" placeholder="Choose a password" required>
+      <input type="password" id="new-password" name="password" placeholder="Choose a password" required>
+
+      <label for="confirm-password">Confirm Password</label>
+      <input type="password" id="confirm-password" name="password_confirmation" placeholder="Confirm your password" required>
 
       <button type="submit" class="btn">Create Account</button>
     </form>
 
-    <p>Already have an account? <a href="signin.html">Sign In</a></p>
+    <p>Already have an account? <a href="<?= url('login')?>">Sign In</a></p>
   </div>
 
   <div class="copyright">
@@ -97,14 +106,50 @@
   </div>
 
   <script>
-    // Simple sign-up mock
-    document.getElementById('signup-form').addEventListener('submit', function(e) {
+    document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const username = document.getElementById('new-username').value;
+      const name = document.getElementById('new-username').value;
+      const email = document.getElementById('new-email').value;
+      const phone = document.getElementById('new-phone').value;
       const password = document.getElementById('new-password').value;
+      const password_confirmation = document.getElementById('confirm-password').value;
 
-      alert("Account created successfully! Please sign in.");
-      window.location.href = "signin.html";
+      try {
+        const response = await fetch("{{ url('/auth/register') }}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            phone,
+            password,
+            password_confirmation
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          alert("Account created successfully! Please sign in.");
+          window.location.href = "{{ url('/login') }}";
+        } else {
+          let msg = data.message || "Registration failed.";
+          if (data.errors) {
+            msg += "\n" + Object.values(data.errors).flat().join('\n');
+          }
+          alert(msg);
+        }
+      } catch (error) {
+        alert("An error occurred. Please try again.");
+      }
+    });
+
+    document.getElementById('new-phone').addEventListener('input', function(e) {
+      this.value = this.value.replace(/[^0-9]/g, '');
     });
   </script>
 </body>
