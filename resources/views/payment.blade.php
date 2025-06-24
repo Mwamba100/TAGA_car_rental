@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -218,40 +217,57 @@
     });
 
     function submitPayment() {
-      const total = calculateDays();
-      const method = paymentSelect.value;
+  const total = calculateDays();
+  const method = paymentSelect.value;
 
-      if (!pickupInput.value || !returnInput.value) {
-        alert("Please select pick-up and return dates.");
-        return;
-      }
+  if (!pickupInput.value || !returnInput.value) {
+    alert("Please select pick-up and return dates.");
+    return;
+  }
 
-      if (total === 0) {
-        alert("Invalid date selection.");
-        return;
-      }
+  // Ensure pickup date is today or in the future
+  const today = new Date();
+  today.setHours(0,0,0,0); // Remove time part for accurate comparison
+  const pickupDate = new Date(pickupInput.value);
+  const returnDate = new Date(returnInput.value);
 
-      if (method === "card") {
-        if (
-          !document.getElementById('cardname').value ||
-          !document.getElementById('cardnumber').value ||
-          !document.getElementById('expiry').value ||
-          !document.getElementById('cvv').value
-        ) {
-          alert("Please fill in all card details.");
-          return;
-        }
-      }
+  if (pickupDate < today) {
+    alert("Pick-up date must be today or a future date.");
+    return;
+  }
 
-      if (method === "mobile") {
-        if (
-          !document.getElementById('provider').value ||
-          !document.getElementById('mobile-number').value
-        ) {
-          alert("Please fill in mobile money details.");
-          return;
-        }
-      }
+  // Ensure return date is after or same as pickup date
+  if (returnDate < pickupDate) {
+    alert("Return date must be after or same as pick-up date.");
+    return;
+  }
+
+  if (total === 0) {
+    alert("Invalid date selection.");
+    return;
+  }
+
+  if (method === "card") {
+    if (
+      !document.getElementById('cardname').value ||
+      !document.getElementById('cardnumber').value ||
+      !document.getElementById('expiry').value ||
+      !document.getElementById('cvv').value
+    ) {
+      alert("Please fill in all card details.");
+      return;
+    }
+  }
+
+  if (method === "mobile") {
+    if (
+      !document.getElementById('provider').value ||
+      !document.getElementById('mobile-number').value
+    ) {
+      alert("Please fill in mobile money details.");
+      return;
+    }
+  }
 
       alert(`Payment Successful!\nCar: ${carName}\nMethod: ${method}\nTotal Paid: K${total}`);
       window.location.href = "{{ url('/') }}";

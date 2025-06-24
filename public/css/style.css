@@ -344,6 +344,23 @@ header {
   color: var(--main-color);
 }
 
+        .fancy-link {
+          color: #cc0000;
+          font-weight: 600;
+          font-size: 1.1rem;
+          text-decoration: underline;
+          transition: color 0.2s;
+          cursor: pointer;
+          display: inline-block;
+        }
+        .fancy-link:hover {
+          color: #a80000;
+          text-decoration: none;
+        }
+        .text-center {
+          text-align: center;
+        }
+
 /* Newsletter */
 .newsletter {
   background: linear-gradient(to top right, #aa0000, #301313);

@@ -99,7 +99,7 @@
           <p>2017</p>
           <h3>Car 1</h3>
           <h2>K1000 <span>/.day</span></h2>
-          <a href="<?= url('payment/201/1000')?>" class="btn rent-btn">Rent Now</a>
+          <a href="{{ url('payment') }}?car=Car%201&price=1000" class="btn rent-btn">Rent Now</a>
         </div>
         <div class="box">
           <div class="box-img">
@@ -108,7 +108,7 @@
           <p>2017</p>
           <h3>Car 2</h3>
           <h2>K1000 <span>/.day</span></h2>
-          <a href="<?= url('payment/202/1000')?>" class="btn rent-btn">Rent Now</a>
+          <a href="{{ url('payment') }}?car=Car%202&price=1000" class="btn rent-btn">Rent Now</a>
         </div>
         <div class="box">
           <div class="box-img">
@@ -117,7 +117,7 @@
           <p>2017</p>
           <h3>Car 3</h3>
           <h2>K1000 <span>/.day</span></h2>
-          <a href="<?= url('payment/203/1000')?>" class="btn rent-btn">Rent Now</a>
+          <a href="{{ url('payment') }}?car=Car%203&price=1000" class="btn rent-btn">Rent Now</a>
         </div>
         <div class="box">
           <div class="box-img">
@@ -126,7 +126,7 @@
           <p>2017</p>
           <h3>Car 4</h3>
           <h2>K1000 <span>/.day</span></h2>
-          <a href="<?= url('payment/204/1000')?>" class="btn rent-btn">Rent Now</a>
+          <a href="{{ url('payment') }}?car=Car%204&price=1000" class="btn rent-btn">Rent Now</a>
         </div>
         <div class="box">
           <div class="box-img">
@@ -135,7 +135,7 @@
           <p>2017</p>
           <h3>Car 5</h3>
           <h2>K1000 <span>/.day</span></h2>
-          <a href="?= url('payment/205/1000')?>" class="btn rent-btn">Rent Now</a>
+          <a href="{{ url('payment') }}?car=Car%205&price=1000" class="btn rent-btn">Rent Now</a>
         </div>
         <div class="box">
           <div class="box-img">
@@ -144,7 +144,7 @@
           <p>2017</p>
           <h3>Car 6</h3>
           <h2>K1000 <span>/.day</span></h2>
-          <a href="<?= url('payment/206/1000')?>" class="btn rent-btn">Rent Now</a>
+          <a href="{{ url('payment') }}?car=Car%206&price=1000" class="btn rent-btn">Rent Now</a>
         </div>
       </div>
     </section>
@@ -156,15 +156,19 @@
       </div>
       <div class="about-container">
         <div class="about-img">
-          <!-- Use an image that represents your company -->
-          <!--
           <img src="{{ asset('images/about.jpg') }}" alt="About Us">
-          -->
         </div>
         <div class="about-text">
           <span>About Us</span>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi, pariatur omnis voluptatibus delectus hic harum provident sunt odit error sit fuga impedit, eum minus fugiat, quaerat mollitia labore deserunt maiores.</p>
-          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet odit dolores quisquam recusandae possimus odio labore ut vero magni consequuntur ducimus saepe asperiores consectetur sed libero, quos exercitationem similique perspiciatis!</p>
+          <p>
+            TAGA Car Rental is dedicated to providing reliable, affordable, and convenient car rental services across Zambia. 
+            Our mission is to make your journey smooth, whether you’re traveling for business, leisure, or adventure. 
+            With a diverse fleet of well-maintained vehicles and a commitment to customer satisfaction, we ensure you get the best value and experience every time you rent with us.
+          </p>
+          <p>
+            Our friendly team is always ready to assist you, from booking to drop-off. We offer flexible rental options, transparent pricing, and 24/7 support to give you peace of mind on the road. 
+            Join thousands of happy customers who trust TAGA Car Rental for their transportation needs. Your journey starts here!
+          </p>
           <a href="#" class="btn">Learn More</a>
         </div>
       </div>
@@ -175,26 +179,26 @@
         <span>Reviews</span>
         <h1>What Our Customers Say</h1>
       </div>
-      <div class="reviews-container">
+      <div class="reviews-container" id="reviewsContainer">
         <div class="box">
           <div class="rev-img">
             <img src="{{asset('images/user.svg')}}" alt="Review 1" width="70" height="70">
           </div>
-          <h2>Someone Name</h2>
+          <h2>Mary Banda</h2>
           <div class="stars">
             <i class="bx bxs-star"></i>
             <i class="bx bxs-star"></i>
             <i class="bx bxs-star"></i>
             <i class="bx bxs-star"></i>
-            <i class="bx bxs-star-half"></i>
+            <i class="bx bxs-star"></i>
           </div>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur eos rerum molestiae fugiat. Eius accusantium ad architecto aliquid.</p>
+          <p>Excellent service! The booking process was smooth and the car was in perfect condition. Will definitely rent again.</p>
         </div>
         <div class="box">
           <div class="rev-img">
             <img src="{{asset('images/user.svg')}}" alt="Review 2" width="70" height="70">
           </div>
-          <h2>Someone Name</h2>
+          <h2>John Zulu</h2>
           <div class="stars">
             <i class="bx bxs-star"></i>
             <i class="bx bxs-star"></i>
@@ -202,13 +206,41 @@
             <i class="bx bxs-star"></i>
             <i class="bx bxs-star-half"></i>
           </div>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat fuga itaque consectetur tempore labore perspiciatis perferendis eligendi incidunt!</p>
+          <p>Great experience! The staff was friendly and the car was very clean. Highly recommend TAGA Car Rental.</p>
         </div>
         <div class="box">
           <div class="rev-img">
             <img src="{{asset('images/user.svg')}}" alt="Review 3" width="70" height="70">
           </div>
-          <h2>Someone Name</h2>
+          <h2>Chipo Mwansa</h2>
+          <div class="stars">
+            <i class="bx bxs-star"></i>
+            <i class="bx bxs-star"></i>
+            <i class="bx bxs-star"></i>
+            <i class="bx bxs-star"></i>
+            <i class="bx bxs-star"></i>
+          </div>
+          <p>Very convenient and affordable. I loved the flexibility and the quick response from the support team.</p>
+        </div>
+        <div class="box d-none">
+          <div class="rev-img">
+            <img src="{{asset('images/user.svg')}}" alt="Review 4" width="70" height="70">
+          </div>
+          <h2>Brian Phiri</h2>
+          <div class="stars">
+            <i class="bx bxs-star"></i>
+            <i class="bx bxs-star"></i>
+            <i class="bx bxs-star"></i>
+            <i class="bx bxs-star"></i>
+            <i class="bx bxs-star"></i>
+          </div>
+          <p>Fast and easy rental process. The car was ready on time and the return was hassle-free. Thank you TAGA!</p>
+        </div>
+        <div class="box d-none">
+          <div class="rev-img">
+            <img src="{{asset('images/user.svg')}}" alt="Review 5" width="70" height="70">
+          </div>
+          <h2>Linda Mulenga</h2>
           <div class="stars">
             <i class="bx bxs-star"></i>
             <i class="bx bxs-star"></i>
@@ -216,9 +248,44 @@
             <i class="bx bxs-star"></i>
             <i class="bx bxs-star-half"></i>
           </div>
-          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam quis architecto suscipit. Debitis repudiandae facilis illum in est!</p>
+          <p>Affordable prices and reliable cars. I had a wonderful trip thanks to TAGA Car Rental. Highly recommend!</p>
         </div>
       </div>
+      <div class="text-center mt-3">
+        <span id="showMoreReviews" class="fancy-link" style="margin:15px auto;display:block;cursor:pointer;">Show More Reviews</span>
+        <span id="showLessReviews" class="fancy-link" style="margin:15px auto;display:none;cursor:pointer;">Show Less Reviews</span>
+      </div>
+
+      <script>
+        // Show only 3 reviews by default, show all on text click, show less to collapse
+        document.addEventListener('DOMContentLoaded', function() {
+          const boxes = document.querySelectorAll('#reviewsContainer .box');
+          const showMoreLink = document.getElementById('showMoreReviews');
+          const showLessLink = document.getElementById('showLessReviews');
+
+          function showOnlyThree() {
+            boxes.forEach((box, i) => {
+              box.style.display = (i > 2) ? 'none' : '';
+            });
+            showMoreLink.style.display = 'inline-block';
+            showLessLink.style.display = 'none';
+          }
+
+          showOnlyThree();
+
+          showMoreLink.addEventListener('click', function() {
+            boxes.forEach(box => box.style.display = '');
+            showMoreLink.style.display = 'none';
+            showLessLink.style.display = 'inline-block';
+          });
+
+          showLessLink.addEventListener('click', function() {
+            showOnlyThree();
+            // Scroll to reviews section for better UX
+            document.getElementById('reviews').scrollIntoView({ behavior: 'smooth' });
+          });
+        });
+      </script>
     </section>
 
     <section class="newsletter">

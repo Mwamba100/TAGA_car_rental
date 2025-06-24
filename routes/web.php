@@ -10,7 +10,7 @@ use App\Http\Controllers\{
 };
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
 
 //Admin page
@@ -27,8 +27,11 @@ Route::get('/register', function () {
     return view('signup');
 });
 
-Route::get('/payment', function () {
-    return view('payment');
+// Accept car and price as query parameters for payment page
+Route::get('/payment', function (\Illuminate\Http\Request $request) {
+    $car = $request->query('car');
+    $price = $request->query('price');
+    return view('payment', compact('car', 'price'));
 });
 
 Route::prefix('auth')->group(function () {
